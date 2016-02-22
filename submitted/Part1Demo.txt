@@ -1,0 +1,11 @@
+Script started on Mon Feb 22 17:12:26 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ as part1.s -o part1.o 
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ld part1.s [K[Ko -o part1
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part1 
+$ ls
+Part1Demo.txt  part1  part1.o  part1.s
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit
+exit
+
+Script done on Mon Feb 22 17:13:20 2016
