@@ -1,0 +1,98 @@
+Script started on Sat Feb 27 14:01:15 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc part3b.c -o part3b -g
+part3b.c: In function 'dumb':
+part3b.c:33:11: warning: assignment makes integer from pointer without a cast [enabled by default]
+      *hold=filename;
+           ^
+part3b.c: In function 'main':
+part3b.c:51:7: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' [-Wformat=]
+       printf("\\Length of Input String:%d\\", strlen(string));
+       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./apart[K[K[K[K[Kpart
+part2   part3a  part3b  
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part3b 
+
+
+Error: No Command Line arg for vuln was given
+
+
+Value of Test:7fffffffba28
+Value of filename[0]:7fffffffba30
+The attack buffer is going to need to be a little bit bigger than:ffff8000000045d0
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -fno-stack-protector part3b.c -o part3b -g
+part3b.c: In function 'dumb':
+part3b.c:33:11: warning: assignment makes integer from pointer without a cast [enabled by default]
+      *hold=filename;
+           ^
+part3b.c: In function 'main':
+part3b.c:51:7: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' [-Wformat=]
+       printf("\\Length of Input String:%d\\", strlen(string));
+       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -fno-stack-protector part3b.c -o part3b -g./part3b [Kgcc part3b.c -o part3b -g[16P./part3b 
+
+
+Error: No Command Line arg for vuln was given
+
+
+Value of Test:7fffffffbe48
+Value of filename[0]:7fffffffba40
+The attack buffer is going to need to be a little bit bigger than:2b50
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part3b gcc -fno-stack-protector part3b.c -o part3b -g./part3b [K[C[C[C[C[C[C[C[C[1P [1P [1P [1P [1P [1P [1P [1P g c c [C - z [C e x e c s t a c k [C p a r t 3 b . c [C - o [C p a r t 3 b [C - g 
+part3b.c: In function 'dumb':
+part3b.c:33:11: warning: assignment makes integer from pointer without a cast [enabled by default]
+      *hold=filename;
+           ^
+part3b.c: In function 'main':
+part3b.c:51:7: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' [-Wformat=]
+       printf("\\Length of Input String:%d\\", strlen(string));
+       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack part3b.c -o part3b -g ./part3b [Kgcc -fno-stack-protector part3b.c -o part3b -g./part3b [K
+
+
+Error: No Command Line arg for vuln was given
+
+
+Value of Test:7fffffffba28
+Value of filename[0]:7fffffffba30
+The attack buffer is going to need to be a little bit bigger than:ffff8000000045d0
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector part3b.c -o part3b -g
+part3b.c: In function 'dumb':
+part3b.c:33:11: warning: assignment makes integer from pointer without a cast [enabled by default]
+      *hold=filename;
+           ^
+part3b.c: In function 'main':
+part3b.c:51:7: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' [-Wformat=]
+       printf("\\Length of Input String:%d\\", strlen(string));
+       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector part3b.c -o part3b -g[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C./part3b [K
+
+
+Error: No Command Line arg for vuln was given
+
+
+Value of Test:7fffffffbe48
+Value of filename[0]:7fffffffba40
+The attack buffer is going to need to be a little bit bigger than:2b50
+$ ls
+Part1Demo.txt  Part2Demo.txt  Part3aDemo1.txt  Part3aDemo2.txt	Part3aExplanation.txt  Part3bDemo.txt  Part3bExplanation.txt  part1.s  part2  part2.o  part2.s	part3a	part3a.c  part3b  part3b.c
+$ ls -l
+total 88
+-rw-rw-r-- 1 seclab seclab   595 Feb 22 17:13 Part1Demo.txt
+-rw-rw-r-- 1 seclab seclab  6095 Feb 25 00:59 Part2Demo.txt
+-rw-rw-r-- 1 seclab seclab  3718 Feb 26 22:40 Part3aDemo1.txt
+-rw-rw-r-- 1 seclab seclab  4122 Feb 26 22:42 Part3aDemo2.txt
+-rw-rw-r-- 1 seclab seclab   855 Feb 26 23:04 Part3aExplanation.txt
+-rw-rw-r-- 1 seclab seclab  4096 Feb 27 14:02 Part3bDemo.txt
+-rw-rw-r-- 1 seclab seclab  2368 Feb 27 13:58 Part3bExplanation.txt
+-rw-rw-r-- 1 seclab seclab   258 Feb 22 17:52 part1.s
+-rwxrwxr-x 1 seclab seclab  1443 Feb 26 13:28 part2
+-rw-rw-r-- 1 seclab seclab  1800 Feb 26 13:28 part2.o
+-rw-rw-r-- 1 seclab seclab   448 Feb 26 13:28 part2.s
+-rwxrwxr-x 1 seclab seclab 15780 Feb 26 22:42 part3a
+-rw-r--r-- 1 seclab seclab  1327 Feb 26 22:42 part3a.c
+-rwxrwxr-x 1 seclab seclab 10593 Feb 27 14:02 part3b
+-rw-r--r-- 1 seclab seclab  1718 Feb 27 12:58 part3b.c
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit
+Script done on Sat Feb 27 14:03:08 2016
