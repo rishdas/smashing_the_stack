@@ -1,0 +1,65 @@
+1. No Compile time options
+   gcc part3b.c -o part3b -g
+
+   Output: seclab@SecurityLabUbuntu64:~/HWA2$ ./part3b 
+
+
+   	   Error: No Command Line arg for vuln was given
+
+
+   	   Value of Test:7fffffffba18
+	   Value of filename[0]:7fffffffba20
+	   The attack buffer is going to need to be a little bit bigger than:ffff8000000045e0
+
+   This doesnot invoke the shell as it is not able to rewrite the return address and redirect the program. This happens becuase of canaries. Hence corrupting the canary results in the program silently exiting.
+
+2. gcc -fno-stack-protector part3b.c -o part3b -g
+
+
+   Output: Error: No Command Line arg for vuln was given
+
+
+   	   Value of Test:7fffffffbe38
+   	   Value of filename[0]:7fffffffba30
+   	   The attack buffer is going to need to be a little bit bigger than:2b50
+	   Segmentation fault (core dumped)
+
+
+   In this variation when I disabled the stack protection. The program runs to seg fault.
+   The reason of this happening is even though there is no stack protection but rewriting the return address causes the program control to reach the stack hence executing the stack which by default is marked as read-only.
+   Hence the segmentation fault.
+
+3. gcc -z execstack part3b.c -o part3b -g
+
+   Output:
+	  Error: No Command Line arg for vuln was given
+
+
+	  Value of Test:7fffffffba18
+	  Value of filename[0]:7fffffffba20
+	  The attack buffer is going to need to be a little bit bigger than:ffff8000000045e0
+
+   In this variation I enabled but only stack execution. This allows the stack to be executed but still with stack protection the attack will not be able to redirect its execution flow as any canry corruption would result in silent exit from the program.
+
+
+4. gcc -z execstack -fno-stack-protector part3b.c -o part3b -g
+
+   Output:
+	  
+	  Error: No Command Line arg for vuln was given
+
+	  Value of Test:7fffffffbe38
+       	  Value of filename[0]:7fffffffba30
+      	  The attack buffer is going to need to be a little bit bigger than:2b50
+       	  $ ls
+       	  BufferRedirect64.c  BufferRedirectViaStack64.c	README.md  attack.c  part2.o  part2.s  part3a  part3a.c  part3b  part3b.c  submitted  test.c  test.s  vuln.c
+       	  $
+
+
+   With stack protection turned off and marking stack as executable the attack is succesful as no canary corruption happens plus post redirection the code section is executable.
+
+
+
+
+
+
