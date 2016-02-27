@@ -1,0 +1,29 @@
+Script started on Fri Feb 26 22:41:22 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit./part3a cat part3a.c | grep mprotectgcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[51Pcat part3a.c | grep mprotect
+    [01;31m[Kmprotect[m[K(buf, strlen(shellcode)+10, PROT_EXEC|PROT_WRITE|PROT_READ);
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3a.c | grep mprotectexit[Kcat part3a.c | grep mprotect
+//    [01;31m[Kmprotect[m[K(buf, strlen(shellcode)+10, PROT_EXEC|PROT_WRITE|PROT_READ);
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3a.c | grep mprotectexit[K./part3a cat part3a.c | grep mprotect./part3a [Kcat part3a.c | grep mprotectgcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g 
+part3a.c: In function 'main':
+part3a.c:42:5: warning: passing argument 1 of 'posix_memalign' from incompatible pointer type [enabled by default]
+     posix_memalign(&buf, pagesize, strlen(shellcode)+10);
+     ^
+In file included from part3a.c:3:0:
+/usr/include/stdlib.h:503:12: note: expected 'void **' but argument is of type 'char **'
+ extern int posix_memalign (void **__memptr, size_t __alignment, size_t __size)
+            ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[51Pcat part3a.c | grep mprotectexit[K./part3a 
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part3a [70@gcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g[C[C[C[C[C[51Pcat part3a.c | grep mprotectexit[K./part3a cat part3a.c | grep mprotectgcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[51Pcat part3a.c | grep mprotect./part3a [K[83@gcc -z execstack -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g[C
+part3a.c: In function 'main':
+part3a.c:42:5: warning: passing argument 1 of 'posix_memalign' from incompatible pointer type [enabled by default]
+     posix_memalign(&buf, pagesize, strlen(shellcode)+10);
+     ^
+In file included from part3a.c:3:0:
+/usr/include/stdlib.h:503:12: note: expected 'void **' but argument is of type 'char **'
+ extern int posix_memalign (void **__memptr, size_t __alignment, size_t __size)
+            ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C./part3a [K[70@gcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C./part3a [K
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit[K[K[K[Kexit
+Script done on Fri Feb 26 22:42:42 2016

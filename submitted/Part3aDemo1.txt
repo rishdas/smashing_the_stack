@@ -1,0 +1,33 @@
+Script started on Fri Feb 26 22:38:39 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector [1@f[1@n[1@o[1@-[1@a[1@s[1@y[1@n[1@c[1@h[1@r[1@o[1@-[1@u[1@n[1@w[1@i[1@n[1@d[1@-[1@t[1@a[1@b[1@l[1@e[1@s[1@ [1@-[1@o[1@ [C[1@p[1@a[1@r[1@t[1@3[1@a[1@ [C[1@p[1@a[1@r[1@t[1@3[1@a[1@.[1@c[1@ [1@-[1@g[C[C[C[C[C[C[C[C[C[1P [1P [1P [1P [1P [1P [1P [1P [1P [C[1@-[1@p[1@r[1@o[1@t[1@e[1@c[1@t[1@o[1@r[1@ 
+gcc: error: unrecognized command line option '-fno-asynchro-unwind-tables'
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector -fno-asynchro-unwind-tables -o part3a part3a.c -g [1@o[1@u[1@s[1P[1P[1P[1P[1@n[1@o[1@u[1@s[1@o
+part3a.c: In function 'main':
+part3a.c:42:5: warning: passing argument 1 of 'posix_memalign' from incompatible pointer type [enabled by default]
+     posix_memalign(&buf, pagesize, strlen(shellcode)+10);
+     ^
+In file included from part3a.c:3:0:
+/usr/include/stdlib.h:503:12: note: expected 'void **' but argument is of type 'char **'
+ extern int posix_memalign (void **__memptr, size_t __alignment, size_t __size)
+            ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./part3a 
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3a.a[Kc | grep mprotect
+    [01;31m[Kmprotect[m[K(buf, strlen(shellcode)+10, PROT_EXEC|PROT_WRITE|PROT_READ);
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3a.c | grep mprotect./part3a [K[83@gcc -z execstack -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P
+part3a.c: In function 'main':
+part3a.c:42:5: warning: passing argument 1 of 'posix_memalign' from incompatible pointer type [enabled by default]
+     posix_memalign(&buf, pagesize, strlen(shellcode)+10);
+     ^
+In file included from part3a.c:3:0:
+/usr/include/stdlib.h:503:12: note: expected 'void **' but argument is of type 'char **'
+ extern int posix_memalign (void **__memptr, size_t __alignment, size_t __size)
+            ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[51Pcat part3a.c | grep mprotect
+    [01;31m[Kmprotect[m[K(buf, strlen(shellcode)+10, PROT_EXEC|PROT_WRITE|PROT_READ);
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3a.c | grep mprotectgcc -fno-stack-protector -fno-asynchronous-unwind-tables -o part3a part3a.c -g [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[51Pcat part3a.c | grep mprotect./part3a [K
+$ exit
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ exit
+exit
+
+Script done on Fri Feb 26 22:40:59 2016
