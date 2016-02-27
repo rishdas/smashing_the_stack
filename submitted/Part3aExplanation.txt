@@ -1,0 +1,6 @@
+The work of mprotect is it to change the access permisions for a memory region.
+In our case it explictly marks the area starting from buf to the end of the shell code including the decoy part as Read write and exec which by default is Read-only.
+The decoy part is just filling up the space of 10 bytes with return address i.e the address of buf which is the start of the exploit code.
+Now if you comment that line the program gives a Seg fault reason the redirection makes the program execute the stack which is marked as read only.
+If you see the output I have also used -z execstack option while compiling to show that if we give this option then commenting or uncommenting the code makes no diffrence.
+The reason is, this flag marks the stack as executable so there is no need for explict marking but if you remove this flag then it gives a Seg Fault.
