@@ -1,0 +1,8 @@
+For this project I got help from:
+My professor: Steven Myers : Communication via mail.
+My AI: Behnood : Debugging for almost 2 hours post lab session.
+My classmate: Gary : Setting of offset
+
+All of them helped me a lot in the debugging of Part4 although I have not been able to sucuessfully bring up the shell i.e conduct the attack.
+My all other parts have been working correctly but for some unknown reason(to me) my Part4 is not working but the people mentioned above did help me a lot.
+Behnood especially sat with me for a 2 hour long debugging session. I would like to thank each and every one of them.
